@@ -8,7 +8,7 @@ import networkx as nx
 
 
 pilha = []
-pilha_resp1 = []
+Melancia = []
 
 '''
 # Esta função é como uma bola de cristal 🎱: ela prevê o gênero do humanóide com base no nome!
@@ -56,19 +56,22 @@ Assim sempre que o WALL-E entrar em contacto com um humano de género masculino 
 def work(posicao, bateria, objetos):
     time.time()
 
-    valid_prefixes = ['operário_', 'visitante_', 'supervisor_']
-
-    if objetos and isinstance(objetos, list) and len(objetos) == 1:
-        obj = objetos[0]
-        for prefix in valid_prefixes:
-            if obj.startswith(prefix) and obj not in pilha and obj[len(prefix):] not in pilha:
-                obj_without_prefix = obj[len(prefix):]
-                pilha.append(obj_without_prefix)
-                if identify_gender(obj_without_prefix) == 'male':
-                    pilha_resp1.append(obj)
-                    # print("pilha: ", pilha)
-                    # print("pilha_resp1: ", pilha_resp1)
-                break   
+  	valid_prefixes = ['operário_', 'visitante_', 'supervisor_']
+   
+  	if objetos and isinstance(objetos, list) and len(objetos) == 1:
+  		obj = objetos[0]
+  		for prefix in valid_prefixes:
+  			if obj.startswith(prefix) and obj not in pilha and obj[len(prefix):] not in pilha:
+  				obj_without_prefix = obj[len(prefix):]
+  				pilha.append(obj_without_prefix)
+  				if identify_gender(obj_without_prefix) == 'male':
+  					Melancia.append(obj)
+  					print("pilha: ", pilha)
+  					print("Melancia: ", Melancia)
+  					#pilha.append(obj)
+  				break
+ 
+	#print("print: ", posicao, bateria, objetos) 
     
     # print("dados: ", posicao, bateria, objetos)
 
@@ -79,11 +82,11 @@ Se tiver toda a informação necessária, vai indicar o nome da penúltima pesso
 '''
 
 def resp1():
-    if len(pilha_resp1) >= 2:
-        penultimate = pilha_resp1[-2]
-        print("O penúltimo elemento é: ", penultimate)
-    else:
-        print("Não existe informação suficiente...")
+  	if len(Melancia) >= 2:
+  		penultimate = Melancia[-2]
+  		print("O penultimo elemento é: ", penultimate)
+  	else:
+  		print("Não existe informação suficiente")
 
 def resp2():
     pass
