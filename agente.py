@@ -1,9 +1,20 @@
 import time
 import gender_guesser.detector as gender
 import networkx as nx
+
+
 # !!!!!!!!!!!!!!! NAO TE ESQUEÇAS DE COLOCAR COMENTARIOS !!!!!!!!!!!!!!!
+  # Comentários? Eles foram adicionados, mas acabaram por fugir para uma festa de binários e agora estão a meter conversa com os bytes! 🕺🔤
+
+
 pilha = []
 pilha_resp1 = []
+
+'''
+# Esta função é como uma bola de cristal 🎱: ela prevê o gênero do humanóide com base no nome!
+# Suponho que no estado em que estamos a seguir enquanto sociedade, seja algo que deixe de funcionar nos próximos anos.
+# Mas acredito que num curto espaço de 2 meses, esta função seja suficiente.
+'''
 
 def identify_gender(name):
     d = gender.Detector()
@@ -35,6 +46,13 @@ Para encontrar o caminho mais curto o networkx já tem uma funcao implementada
 print(nx.shortest_path(G, 6, 11)) o 6 e 11 são exemplos de como funciona -> to-do: implementar isto no futuro adaptado à pergunta
 '''
 
+'''
+Esta função identifica cada objeto em que o WALL-E entra em contacto e vai inserindo numa pilha.
+Para identificar um humano é usado uma lista de prefixos com os títulos disponíveis. 
+Assim sempre que o WALL-E entrar em contacto com um humano de género masculino vai inserir apenas o seu nome numa pilha de nome pilha_resp1
+(Nomear a pilha de male_pilha ou obj_pessoas poderia deixar os humanos um tanto... objetificados ou confusos com outras coisas, então optei por um nome mais simples! 🤖)
+'''
+
 def work(posicao, bateria, objetos):
     time.time()
 
@@ -48,11 +66,17 @@ def work(posicao, bateria, objetos):
                 pilha.append(obj_without_prefix)
                 if identify_gender(obj_without_prefix) == 'male':
                     pilha_resp1.append(obj)
-                    print("pilha: ", pilha)
-                    print("pilha_resp1: ", pilha_resp1)
+                    # print("pilha: ", pilha)
+                    # print("pilha_resp1: ", pilha_resp1)
                 break   
     
     # print("dados: ", posicao, bateria, objetos)
+
+'''
+Esta função começa por verificar quantas pessoas de género masculino o WALL-E esteve em contacto.
+Se apenas teve em contacto com uma (ou com nenhuma) ele indica que não possui informação suficiente para resolver o problema.
+Se tiver toda a informação necessária, vai indicar o nome da penúltima pessoa que encontrou!
+'''
 
 def resp1():
     if len(pilha_resp1) >= 2:
