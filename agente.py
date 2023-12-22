@@ -8,7 +8,7 @@ NUM1, NOME1
 PERGUNTAS:
 1. DONE
 2. DONE
-3. ja tem base falta implementar
+3. DONE
 
 TAREFAS NO GERAL:
 - Definicao de grafo e atributos || DONE ||
@@ -42,17 +42,20 @@ Definicao de atributos:
 		A zona 11 precisa de pontos extra
 '''
 for i in range(15):
-    G.add_node(i, tipo = "sem identificação")
+	G.add_node(i, tipo = "sem identificação")
+for i in range(1,5):
+	G.add_node(i, tipo = "corredor")
+G.add_node(10, tipo = "entrada")
 
 coordenadas = ([
-    (0, {"coord": [[140,230],[485,335]]}),
-    (1, {"coord": [[30,165],[135,375]]}),
-    (2, {"coord": [[140,165],[485,185]]}),
+    (0, {"coord": [[155,230],[485,335]]}),
+    (1, {"coord": [[30,165],[150,375]]}),
+    (2, {"coord": [[155,165],[485,185]]}),
     (3, {"coord": [[30,380],[525,435]]}),
     (4, {"coord": [[530,180],[635,435]]}),
-    (5, {"coord": [[30,30],[135,160]]}),
-    (6, {"coord": [[180,30],[285,160]]}),
-    (7, {"coord": [[330,30],[485,160]]}),
+    (5, {"coord": [[30,30],[135,135]]}),
+    (6, {"coord": [[180,30],[285,135]]}),
+    (7, {"coord": [[330,30],[485,135]]}),
     (8, {"coord": [[530,30],[770,185]]}),
     (9, {"coord": [[640,230],[770,285]]}),
     (10, {"coord": [[640,330],[770,385]]}),
@@ -76,11 +79,6 @@ edge_list = [
 ]
 G.add_edges_from(edge_list)
 # !!! FIM DEFINICAO GRAFO !!!
-
-'''
-Para encontrar o caminho mais curto o networkx já tem uma funcao implementada
-print(nx.shortest_path(G, 6, 11)) o 6 e 11 são exemplos de como funciona -> to-do: implementar isto no futuro adaptado à pergunta
-'''
 
 posatual = 10 # numero da zona atual
 nodeatual = G.nodes[posatual]
@@ -153,10 +151,17 @@ def resp1():
 
 def resp2():
 	print("A zona", posatual, "é do tipo", nodeatual["tipo"])	
-	pass
 
 def resp3():
-	pass
+	dest = -1
+	for i in range(15):
+		if G.nodes[i]["tipo"] == "empacotamento":
+			dest = i
+			break
+	if dest == -1:
+		print("Ainda não sei a localização da zona de empacotamento")
+	else:
+		print("O caminho desde a zona", posatual, "até a zona de empacotamento", dest, "é:", nx.shortest_path(G, posatual, dest))
 
 def resp4():
 	pass
