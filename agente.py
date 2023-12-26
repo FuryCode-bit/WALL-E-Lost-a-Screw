@@ -16,7 +16,6 @@ TAREFAS NO GERAL:
 '''
 
 import time
-import gender_guesser.detector as gender
 import networkx as nx
 
 pilha = []
@@ -28,8 +27,12 @@ Melancia = []
 # Mas acredito que num curto espaço de 2 meses, esta função seja suficiente.
 '''
 def identify_gender(name):
-	d = gender.Detector()
-	return d.get_gender(name)
+    with open('utils/p1/listaNomes.txt', 'r') as file:
+        for line in file:
+            if line.lower().find(name.lower()) != -1:
+                return True  # Assuming gender is 'male' or 'female'
+
+    return False
 
 
 # !!! DEFINICAO GRAFO !!!
@@ -125,7 +128,7 @@ def work(posicao, bateria, objetos):
 				if obj.startswith(prefix) and obj not in pilha and obj[len(prefix):] not in pilha:
 					obj_without_prefix = obj[len(prefix):]
 					pilha.append(obj_without_prefix)
-					if identify_gender(obj_without_prefix) == 'male':
+					if identify_gender(obj_without_prefix) == True:
 						Melancia.append(obj)
 						print("pilha: ", pilha)
 						print("Melancia: ", Melancia)
