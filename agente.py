@@ -19,7 +19,7 @@ import time
 import networkx as nx
 
 pilha = []
-Melancia = []
+encontros = []
 
 '''
 # Esta função é como uma bola de cristal 🎱: ela prevê o gênero do humanóide com base no nome!
@@ -129,9 +129,9 @@ def work(posicao, bateria, objetos):
 					obj_without_prefix = obj[len(prefix):]
 					pilha.append(obj_without_prefix)
 					if identify_gender(obj_without_prefix) == True:
-						Melancia.append(obj)
+						encontros.append(obj)
 						print("pilha: ", pilha)
-						print("Melancia: ", Melancia)
+						print("encontros: ", encontros)
 						#pilha.append(obj)
 					break
 	
@@ -146,9 +146,9 @@ Se tiver toda a informação necessária, vai indicar o nome da penúltima pesso
 '''
 
 def resp1():
-	if len(Melancia) >= 2:
-		penultimate = Melancia[-2]
-		print("O penultimo elemento é: ", penultimate)
+	if len(encontros) >= 2:
+		penultimo = encontros[-2]
+		print("O penultimo elemento é: ", penultimo)
 	else:
 		print("Não existe informação suficiente")
 
