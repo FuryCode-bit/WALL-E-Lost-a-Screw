@@ -1,5 +1,5 @@
 """
-NUM1, NOME1
+45703, Marco Bernardes
 46811, Ana Lúcia Ferreira
 """
 
@@ -30,7 +30,7 @@ def identify_gender(name):
     with open('utils/p1/listaNomes.txt', 'r') as file:
         for line in file:
             if line.lower().find(name.lower()) != -1:
-                return True  # Assuming gender is 'male' or 'female'
+                return True
 
     return False
 
