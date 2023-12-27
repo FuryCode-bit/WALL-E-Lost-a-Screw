@@ -156,15 +156,18 @@ def resp2():
 	print("A zona", posatual, "é do tipo", nodeatual["tipo"])	
 
 def resp3():
-	dest = -1
-	for i in range(15):
-		if G.nodes[i]["tipo"] == "empacotamento":
-			dest = i
-			break
-	if dest == -1:
-		print("Ainda não sei a localização da zona de empacotamento")
+	if nodeatual["tipo"] == "empacotamento":
+		print("Já estou na zona de empacotamento!")
 	else:
-		print("O caminho desde a zona", posatual, "até a zona de empacotamento", dest, "é:", nx.shortest_path(G, posatual, dest))
+		dest = -1
+		for i in range(15):
+			if G.nodes[i]["tipo"] == "empacotamento":
+				dest = i
+				break
+		if dest == -1:
+			print("Ainda não sei a localização da zona de empacotamento")
+		else:
+			print("O caminho desde a zona", posatual, "até a zona de empacotamento", dest, "é:", nx.shortest_path(G, posatual, dest))
 
 def resp4():
 	pass
