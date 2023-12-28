@@ -1,38 +1,36 @@
+# -*- coding: utf-8 -*-
+ 
 """
 45703, Marco Bernardes
 46811, Ana Lúcia Ferreira
 """
-
+ 
 '''
 !!!TODO LIST!!!
 PERGUNTAS:
 1. DONE
 2. DONE
 3. DONE
+4. TODO
+5. TODO
+6. DONE
+7. TODO
+8. TODO
 
+ 
 TAREFAS NO GERAL:
 - Definicao de grafo e atributos || DONE ||
 - Atualizar o tipo de zona quando o robot a descobre || DONE ||
 '''
-
+ 
 import time
 import networkx as nx
+from utils import p1, p6
 
 pilha = []
 encontros = []
-
-'''
-# Esta função é como uma bola de cristal 🎱: ela prevê o gênero do humanóide com base no nome!
-# Suponho que no estado em que estamos a seguir enquanto sociedade, seja algo que deixe de funcionar nos próximos anos.
-# Mas acredito que num curto espaço de 2 meses, esta função seja suficiente.
-'''
-def identify_gender(name):
-    with open('utils/p1/listaNomes.txt', 'r') as file:
-        for line in file:
-            if line.lower().find(name.lower()) != -1:
-                return True
-
-    return False
+ 
+pilhaBateriaTempo = []
 
 
 # !!! DEFINICAO GRAFO !!!
@@ -92,12 +90,32 @@ Para identificar um humano é usado uma lista de prefixos com os títulos dispon
 Assim sempre que o WALL-E entrar em contacto com um humano de género masculino vai inserir apenas o seu nome numa pilha de nome pilha_resp1
 (Nomear a pilha de male_pilha ou obj_pessoas poderia deixar os humanos um tanto... objetificados ou confusos com outras coisas, então optei por um nome mais simples! 🤖)
 '''
+
+tempoDecorrido = time.time()
+tempo100 = time.time()
+ 
+def updateListaBateriaTempo(bateria):
+    global tempoDecorrido, tempo100, pilhaBateriaTempo
+    if bateria == 100:
+        tempo100 = time.time()
+ 
+    tempoDecorrido = time.time() - tempo100
+ 
+    if int(bateria) % 5 == 0 and int(bateria) != 100:
+        pilhaBateriaTempo.append((bateria, tempoDecorrido))
+        # print("pilhaBateriaTempo: ", pilhaBateriaTempo)
+    if int(bateria) == 0:
+        print("Bateria acabou!")
+        # print(pilhaBateriaTempo)
+
 def work(posicao, bateria, objetos):
-	time.time()
-	
+ 
+	global tempo_final
+	global tempo_decorrido
+ 
 	global posatual
 	global nodeatual
-	
+ 
 	# !!! MUDANCA DE ZONA !!!
 	if posicao[0] <= nodeatual["coord"][0][0] or posicao[0] >= nodeatual["coord"][1][0] \
 	or posicao[1] <= nodeatual["coord"][0][1] or posicao[1] >= nodeatual["coord"][1][1]:
@@ -115,10 +133,11 @@ def work(posicao, bateria, objetos):
 					nodeatual = G.nodes[posatual]
 					print("Mudança de zona para: ", i)
 	# !!! FIM MUDANCA DE ZONA !!!
-	
+ 
 	person_prefixes = ['operário_', 'visitante_', 'supervisor_']
 	if objetos and isinstance(objetos, list) and len(objetos) == 1:
 		obj = objetos[0]
+ 
 		# Mudar tipo de zona
 		if obj.startswith("zona_") and nodeatual["tipo"] == "sem identificação":
 			nodeatual["tipo"] = obj[len("zona_"):]
@@ -128,22 +147,22 @@ def work(posicao, bateria, objetos):
 				if obj.startswith(prefix) and obj not in pilha and obj[len(prefix):] not in pilha:
 					obj_without_prefix = obj[len(prefix):]
 					pilha.append(obj_without_prefix)
-					if identify_gender(obj_without_prefix) == True:
+					if p1.identifica_genero(obj_without_prefix) == True:
 						encontros.append(obj)
 						print("pilha: ", pilha)
 						print("encontros: ", encontros)
 						#pilha.append(obj)
 					break
-	
-	
-	# print("print: ", posicao, bateria, objetos) 
-	# print("dados: ", posicao, bateria, objetos)
-
-'''
-Esta função começa por verificar quantas pessoas de género masculino o WALL-E esteve em contacto.
-Se apenas teve em contacto com uma (ou com nenhuma) ele indica que não possui informação suficiente para resolver o problema.
-Se tiver toda a informação necessária, vai indicar o nome da penúltima pessoa que encontrou!
-'''
+ 
+	updateListaBateriaTempo(bateria)
+	# print("dados: ", posicao, bateria, objetos, time.perf_counter())
+ 
+	'''
+	Esta função começa por verificar quantas pessoas de género masculino o WALL-E esteve em contacto.
+	Se apenas teve em contacto com uma (ou com nenhuma) ele indica que não possui informação suficiente para resolver o problema.
+	Se tiver toda a informação necessária, vai indicar o nome da penúltima pessoa que encontrou!
+	'''
+ 
 
 def resp1():
 	if len(encontros) >= 2:
@@ -176,7 +195,11 @@ def resp5():
 	pass
 
 def resp6():
-	pass
+	# Chama a função para estimar o tempo necessário
+	tempo_estimado = p6.PrevisaoPorBateria(pilhaBateriaTempo)
+ 
+	# Exibe o tempo estimado para atingir o nível de bateria desejado
+	print(f"Tempo estimado para atingir 0% de bateria: {tempo_estimado:.2f} segundos")
 
 def resp7():
 	pass
