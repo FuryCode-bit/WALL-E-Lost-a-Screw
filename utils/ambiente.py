@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import networkx as nx
 import math
 
@@ -28,7 +29,7 @@ def criarGrafo():
 	global G
 
 	for i in range(15):
-		G.add_node(i, tipo = "sem identificação")
+		G.add_node(i, tipo = "sem identificação", maquinas=[], operarios=[], supervisores=[])
 	for i in range(1,5):
 		G.add_node(i, tipo = "corredor")
 	G.add_node(10, tipo = "entrada")
@@ -84,6 +85,12 @@ def criarGrafo():
 	}
 	nx.set_edge_attributes(G, ligZonas)
 	
+	# Draw the graph
+	# nx.draw_networkx(G, with_labels=True, node_color='skyblue', node_size=800, font_weight='bold')
+
+	# Display the graph
+	# plt.show()
+
 	return G
 	
 # Atualizar a zona atual	
@@ -150,3 +157,42 @@ def distancia(caminho):
 		posAnterior = ligacao
 		
 	return distTotal
+
+def probabildadeProximoSerSupervisor(grafo):
+
+	#TODO -> Não esquecer documentar a implementação
+	## Input: G.nodes(data=True)
+	"""
+	Determina a probabilidade de a proxima pessoa ser um supervisor
+	Contabiliza os "objetos" agrupando-os de forma individual
+
+	Returns:
+		float: probabilidade de a proxima pessoa avistada ser um supervisor
+	"""
+	# Contadores
+	counters = {
+		"countA": 0,
+		"countB": 0,
+		"countC": 0
+	}
+
+	for node in grafo:
+		counters["countA"] += len(node[1]["maquinas"]) if len(node[1]["maquinas"]) > 0 else 0
+		counters["countB"] += len(node[1]["operarios"]) if len(node[1]["operarios"]) > 0 else 0
+		counters["countC"] += len(node[1]["supervisores"]) if len(node[1]["supervisores"]) > 0 else 0
+
+	# print("countA: ", counters["countA"])
+	# print("countB: ", counters["countB"])
+	# print("countC: ", counters["countC"])
+
+	total_objects = counters["countA"] + counters["countB"] + counters["countC"]
+	print("total_objects: ", total_objects)
+
+	pA = counters["countA"] / total_objects
+	pB = counters["countB"] / total_objects
+
+	pBAC = (pA * pB * 0.8)
+	pBnAC = ((1 - pA) * pB * 0.5)
+	pCandB = pBAC + pBnAC
+
+	return pCandB / pB

@@ -68,14 +68,27 @@ def work(posicao, bateria, objetos):
 	if posicao[0] <= nodeAtual["coord"][0][0] or posicao[0] >= nodeAtual["coord"][1][0] \
 	or posicao[1] <= nodeAtual["coord"][0][1] or posicao[1] >= nodeAtual["coord"][1][1]:
 		posAtual, nodeAtual = amb.mudarZona(posicao, posAtual)
- 
+	
 	person_prefixes = ['operário_', 'visitante_', 'supervisor_']
+	operario_prefix = 'operário_'
+	supervisor_prefix = 'supervisor_'
+	maquina_prefix = 'máquina_'
 	if objetos and isinstance(objetos, list) and len(objetos) == 1:
 		obj = objetos[0]
  		# Mudar Tipo de Zona
 		if obj.startswith("zona_") and amb.compTipoZona(nodeAtual, "sem identificação"):
 			nodeAtual["tipo"] = obj[len("zona_"):]
 			print("Mudança de tipo de zona para: ", nodeAtual["tipo"])
+		elif obj.startswith(maquina_prefix):
+			nodeAtual["maquinas"].append(obj[len(maquina_prefix):])
+			print(nodeAtual)
+		elif obj.startswith(operario_prefix):
+			nodeAtual["operarios"].append(obj[len(operario_prefix):])
+			print(nodeAtual)
+		elif obj.startswith(supervisor_prefix):
+			# G.nodes[node_key]['values'].append(user_input)
+			nodeAtual["supervisores"].append(obj[len(supervisor_prefix):])
+			print(nodeAtual)
 		else:
 			for prefix in person_prefixes:
 				if obj.startswith(prefix) and obj not in pilha and obj[len(prefix):] not in pilha:
@@ -97,6 +110,7 @@ Esta função começa por verificar quantas pessoas de género masculino o WALL-
 Se apenas teve em contacto com uma (ou com nenhuma) ele indica que não possui informação suficiente para resolver o problema.
 Se tiver toda a informação necessária, vai indicar o nome da penúltima pessoa que encontrou!
 '''
+
 def resp1():
 	if len(encontros) >= 2:
 		penultimo = encontros[-2]
@@ -140,7 +154,7 @@ def resp6():
 	print(f"Tempo estimado para atingir 0% de bateria: {tempo_estimado:.2f} segundos")
 
 def resp7():
-	pass
+	print(amb.probabildadeProximoSerSupervisor(G.nodes(data=True)))
 
 def resp8():
 	pass
