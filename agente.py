@@ -89,15 +89,17 @@ def work(posicao, bateria, objetos):
 			nodeAtual["tipo"] = obj[len("zona_"):]
 			print("Mudança de tipo de zona para: ", nodeAtual["tipo"])
 		elif obj.startswith(maquina_prefix):
-			nodeAtual["maquinas"].append(obj[len(maquina_prefix):])
-			print(nodeAtual)
+			maquina_value = obj[len(maquina_prefix):]
+			if maquina_value not in nodeAtual["maquinas"]:
+				nodeAtual["maquinas"].append(obj[len(maquina_prefix):])
 		elif obj.startswith(operario_prefix):
-			nodeAtual["operarios"].append(obj[len(operario_prefix):])
-			print(nodeAtual)
+			operario_value = obj[len(operario_prefix):]
+			if maquina_value not in nodeAtual["operarios"]:
+				nodeAtual["operarios"].append(obj[len(operario_prefix):])
 		elif obj.startswith(supervisor_prefix):
-			# G.nodes[node_key]['values'].append(user_input)
-			nodeAtual["supervisores"].append(obj[len(supervisor_prefix):])
-			print(nodeAtual)
+			supervisor_value = obj[len(supervisor_prefix):]
+			if maquina_value not in nodeAtual["supervisores"]:
+				nodeAtual["supervisores"].append(obj[len(supervisor_prefix):])
 		else:
 			for prefix in person_prefixes:
 				if obj.startswith(prefix) and obj not in pilha and obj[len(prefix):] not in pilha:
