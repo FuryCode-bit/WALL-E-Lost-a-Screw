@@ -87,7 +87,6 @@ def work(posicao, bateria, objetos):
 			operario_value = obj[len(operario_prefix):]
 			if operario_value not in nodeAtual["operarios"]:
 				nodeAtual["operarios"].append(operario_value)
-				print(nodeAtual)
 		elif obj.startswith(supervisor_prefix):
 			supervisor_value = obj[len(supervisor_prefix):]
 			if supervisor_value not in nodeAtual["supervisores"]:
