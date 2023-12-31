@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import networkx as nx
 import math
  
@@ -84,13 +83,7 @@ def criarGrafo():
 		(4, 11): {"ligacao": [585, 440]}
 	}
 	nx.set_edge_attributes(G, ligZonas)
- 
-	# Draw the graph
-	nx.draw_networkx(G, with_labels=True, node_color='skyblue', node_size=800, font_weight='bold')
- 
-	# Display the graph
-	plt.show()
- 
+
 	return G
  
 # Atualizar a zona atual	
