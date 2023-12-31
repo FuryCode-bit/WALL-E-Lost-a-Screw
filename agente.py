@@ -14,7 +14,7 @@ PERGUNTAS:
 4. DONE (I THINK)
 5. TODO
 6. DONE
-7. TODO
+7. DONE - Needs Revision
 8. TODO
 '''
  
@@ -76,6 +76,15 @@ def work(posicao, bateria, objetos):
 	if objetos and isinstance(objetos, list) and len(objetos) == 1:
 		obj = objetos[0]
  		# Mudar Tipo de Zona
+		# Cada Node está estruturado da seguinte maneira:
+		# Node (
+		#  tipo: str	
+		#  maquinas: []	
+		#  operarios: []	
+		#  supervisores: []	
+		#  Coord: [[][]]
+		
+		# A implementação seguinte armazena cada objeto de acordo com o seu prefixo na lista correspondente
 		if obj.startswith("zona_") and amb.compTipoZona(nodeAtual, "sem identificação"):
 			nodeAtual["tipo"] = obj[len("zona_"):]
 			print("Mudança de tipo de zona para: ", nodeAtual["tipo"])
