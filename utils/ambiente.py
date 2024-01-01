@@ -1,18 +1,18 @@
 import networkx as nx
 import math
- 
+
 # Variáveis globais
 posicaoRobot = 0
 G = nx.Graph()
- 
+
 def givePosicao(posicao):
 	global posicaoRobot 
 	posicaoRobot = posicao
- 
+
 # Transferir a posição atual do robot para as funções de resposta
 def getPosicao():
 	return posicaoRobot
- 
+
 '''
 Nesta função criamos um grafo que vai corresponder às ligações entre as zonas da fábrica.
 Cada nodo (número da zona) tem os seguintes atributos:
@@ -26,13 +26,13 @@ Cada aresta (ligação entre duas zonas) tem o seguinte atributo:
 '''
 def criarGrafo():
 	global G
- 
+
 	for i in range(15):
-		G.add_node(i, tipo = "sem identificação", maquinas=[], operarios=[], supervisores=[])
+		G.add_node(i, tipo = "sem identificação")
 	for i in range(1,5):
 		G.add_node(i, tipo = "corredor")
 	G.add_node(10, tipo = "entrada")
- 
+
 	coordenadas = ([
 		(0, {"coord": [[155,230],[485,335]]}),
 		(1, {"coord": [[30,140],[150,375]]}),
@@ -51,7 +51,7 @@ def criarGrafo():
 		(14, {"coord": [[30,440],[150,570]]}),
 	])
 	G.add_nodes_from(coordenadas)
- 
+
 	# Ligacoes entre zonas
 	edge_list = [
 		# Corredor 1
@@ -64,7 +64,7 @@ def criarGrafo():
 		(4, 8), (4, 9), (4, 10), (4, 11)
 	]
 	G.add_edges_from(edge_list)
- 
+	
 	# Ponto de ligação entre duas zonas
 	ligZonas = {
 		(1, 0): {"ligacao": [150, 280]},
@@ -83,9 +83,9 @@ def criarGrafo():
 		(4, 11): {"ligacao": [585, 440]}
 	}
 	nx.set_edge_attributes(G, ligZonas)
-
+	
 	return G
- 
+	
 # Atualizar a zona atual	
 def mudarZona(posicao, posAtual):
 	for i in G[posAtual]:
@@ -101,15 +101,15 @@ def mudarZona(posicao, posAtual):
 				posAtual = i
 				nodeAtual = G.nodes[posAtual]
 				print("Mudança de zona para: ", i) #Comentar depois
- 
+				
 	return posAtual, G.nodes[posAtual]
- 
+	
 # Verifica se a zona tem o tipo dado
 def compTipoZona(node, tipo):
 	if node["tipo"] == tipo:
 		return True
 	return False
- 
+
 # Procura a zona que contém o tipo dado
 def procurarTipoZona(tipo):
 	dest = -1
@@ -117,25 +117,25 @@ def procurarTipoZona(tipo):
 		if compTipoZona(G.nodes[i], tipo):
 			dest = i
 			break
- 
+			
 	return dest
- 
+	
 def pontoMedio(posicao):
 	pontoMedioX = (posicao[0][0] + posicao[1][0])/2
 	pontoMedioY = (posicao[0][1] + posicao[1][1])/2
- 
+	
 	return [pontoMedioX, pontoMedioY]
- 
+	
 # Calcula a distância de um dado caminho
 def distancia(caminho):
 	distTotal = 0
 	posAnterior = [0,0]
- 
+	
 	for i in range(len(caminho) - 1):
 		zonaAtual = caminho[i]
 		nodeZona = G.nodes[zonaAtual]
 		ligacao = G[zonaAtual][caminho[i + 1]]["ligacao"]
- 
+		
 		# Se for a zona inicial utiliza a posição onde o robot se encontra
 		if posAnterior == [0,0]:
 			pos = getPosicao()
@@ -148,44 +148,5 @@ def distancia(caminho):
 		distZona = math.sqrt((pos[0] - ligacao[0])**2 + (pos[1] - ligacao[1])**2)
 		distTotal = distTotal + round(distZona)
 		posAnterior = ligacao
- 
+		
 	return distTotal
-
-def probabildadeProximoSerSupervisor():
-
-	#TODO -> Não esquecer documentar a implementação
-	## Input: G.nodes(data=True)
-	"""
-	Determina a probabilidade de a proxima pessoa ser um supervisor
-	Contabiliza os "objetos" agrupando-os de forma individual
-
-	Returns:
-		float: probabilidade de a proxima pessoa avistada ser um supervisor
-	"""
-	# Contadores
-	counters = {
-		"countA": 0,
-		"countB": 0,
-		"countC": 0
-	}
-
-	for node in G.nodes(data=True):
-		counters["countA"] += len(node[1]["maquinas"]) if len(node[1]["maquinas"]) > 0 else 0
-		counters["countB"] += len(node[1]["operarios"]) if len(node[1]["operarios"]) > 0 else 0
-		counters["countC"] += len(node[1]["supervisores"]) if len(node[1]["supervisores"]) > 0 else 0
-
-	# print("countA: ", counters["countA"])
-	# print("countB: ", counters["countB"])
-	# print("countC: ", counters["countC"])
-
-	total_objects = counters["countA"] + counters["countB"] + counters["countC"]
-	print("total_objects: ", total_objects)
-
-	pA = counters["countA"] / total_objects
-	pB = counters["countB"] / total_objects
-
-	pBAC = (pA * pB * 0.8)
-	pBnAC = ((1 - pA) * pB * 0.5)
-	pCandB = pBAC + pBnAC
-
-	return pCandB / pB
