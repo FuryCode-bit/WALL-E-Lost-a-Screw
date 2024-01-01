@@ -11,16 +11,16 @@ PERGUNTAS:
 1. DONE
 2. DONE
 3. DONE
-4. DONE (I THINK)
+4. DONE
 5. TODO
 6. DONE
 7. DONE (Check Calculus)
-8. TODO
+8. DONE
 '''
  
 import time
 import networkx as nx
-from utils import p1, p6, ambiente as amb
+from utils import p1, p6, ambiente as amb, probabilidades as pb
  
 pilha = []
 encontros = []
@@ -34,7 +34,10 @@ nodeAtual = G.nodes[posAtual]
  
 tempoDecorrido = time.time()
 tempo100 = time.time()
- 
+
+# Criar Rede Bayesiana
+pb.criarRedeBayesiana()
+
 # esta funcao nao devia de estar no p6?
 def updateListaBateriaTempo(bateria):
     global tempoDecorrido, tempo100, pilhaBateriaTempo
@@ -64,7 +67,7 @@ def work(posicao, bateria, objetos):
 	global posAtual
 	global nodeAtual
  
-	# Mudança de Zona
+	# Deteta se a posição atual é diferente dos pontos extremos da zona atual se sim, procura a nova zona
 	if posicao[0] <= nodeAtual["coord"][0][0] or posicao[0] >= nodeAtual["coord"][1][0] \
 	or posicao[1] <= nodeAtual["coord"][0][1] or posicao[1] >= nodeAtual["coord"][1][1]:
 		posAtual, nodeAtual = amb.mudarZona(posicao, posAtual)
@@ -75,10 +78,9 @@ def work(posicao, bateria, objetos):
 	maquina_prefix = 'máquina_'
 	if objetos and isinstance(objetos, list) and len(objetos) == 1:
 		obj = objetos[0]
- 		# Mudar Tipo de Zona
+ 		# Se o objeto é uma zona e o tipo da zona atual ainda não tiver sido alterado
 		if obj.startswith("zona_") and amb.compTipoZona(nodeAtual, "sem identificação"):
 			nodeAtual["tipo"] = obj[len("zona_"):]
-			print("Mudança de tipo de zona para: ", nodeAtual["tipo"])
 		elif obj.startswith(maquina_prefix):
 			maquina_value = obj[len(maquina_prefix):]
 			if maquina_value not in nodeAtual["maquinas"]:
@@ -130,6 +132,7 @@ def resp3():
 		if dest == -1:
 			print("Ainda não sei a localização da zona de empacotamento")
 		else:
+			# nx.shortest_path devolve o caminho composto apenas pelos numeros das zonas
 			print("O caminho desde a zona", posAtual, "até a zona de empacotamento", dest, "é:", nx.shortest_path(G, posAtual, dest))
  
 def resp4():
@@ -157,9 +160,15 @@ def resp6():
 def resp7():
 	# Qual a probabilidade da próxima pessoa que encontrares ser um supervisor?
 	try:
-		print(f"A probabilidade da próxima pessoa que encontrar ser um supervisor é {amb.probabildadePrximoSerSupervisor(G):.3f}")
+		print(f"A probabilidade da próxima pessoa que encontrar ser um supervisor é {pb.probabildadePrximoSerSupervisor(G):.3f}")
 	except ZeroDivisionError:
 		print("Não existe informação suficiente no mundo conhecido!")
 		
 def resp8():
-	pass
+	def resp8():
+	res = pb.calcularProbabilidade(G,{'maquina': 1, 'supervisor': 0}, 'operario', 1) 
+	if res == -1:
+		print("Não existe informação suficiente no mundo conhecido!")
+	else:
+		print("A P(Operário|Máquina,!Supervisor) =", res)
+
