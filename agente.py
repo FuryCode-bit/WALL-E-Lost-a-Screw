@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
- 
 """
 45703, Marco Bernardes
 46811, Ana Lúcia Ferreira
@@ -12,7 +10,7 @@ PERGUNTAS:
 2. DONE
 3. DONE
 4. DONE
-5. DONE (I THINK)
+5. DONE (~)
 6. DONE
 7. DONE (I THINK)
 8. DONE
