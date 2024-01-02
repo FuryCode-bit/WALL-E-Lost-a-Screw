@@ -4,10 +4,6 @@
 """
  
 '''
-
-# TODO 
-Try catches e verificações finais.
-
 PERGUNTAS:
 1. DONE
 2. DONE
