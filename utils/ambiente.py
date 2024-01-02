@@ -28,7 +28,7 @@ def criarGrafo():
 	global G
 
 	for i in range(15):
-		G.add_node(i, tipo = "sem identificação")
+		G.add_node(i, tipo = "sem identificação", maquinas=[], operarios=[], supervisores=[])
 	for i in range(1,5):
 		G.add_node(i, tipo = "corredor")
 	G.add_node(10, tipo = "entrada")
