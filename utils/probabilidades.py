@@ -1,9 +1,13 @@
 import pyAgrum as gum
 
 def probabilidadeProximoSerSupervisor():
+	'''
+	 A _> Máquina
+	 B -> Operário
+	 C -> Supervisor
 
-	#Solução: P(C) = P(C | A, B) * P(A, B) + P(C | ¬A, B) * P(¬A, B) + P(C | A, ¬B) * P(A, ¬B) + P(C | ¬A, ¬B) * P(¬A, ¬B)
-	
+	Solução: P(C) = P(C | A, B) * P(A, B) + P(C | ¬A, B) * P(¬A, B) + P(C | A, ¬B) * P(A, ¬B) + P(C | ¬A, ¬B) * P(¬A, ¬B)
+	'''	
 	"""
 	Determina a probabilidade de a proxima pessoa ser um supervisor
 	Contabiliza os "objetos" agrupando-os de forma individual
