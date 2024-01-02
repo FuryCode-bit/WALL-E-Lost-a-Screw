@@ -4,6 +4,7 @@ def probabilidadeProximoSerSupervisor():
 
 	#TODO -> Não esquecer documentar a implementação
 	## Input: G.nodes(data=True)
+	
 	"""
 	Determina a probabilidade de a proxima pessoa ser um supervisor
 	Contabiliza os "objetos" agrupando-os de forma individual
@@ -11,6 +12,9 @@ def probabilidadeProximoSerSupervisor():
 	Returns:
 		float: probabilidade de a proxima pessoa avistada ser um supervisor
 	"""
+
+	global G
+	
 	# Contadores
 	counters = {
 		"countA": 0,
@@ -45,6 +49,7 @@ Cria um Rede Bayesiana que relaciona as probabilidades numa zona estarem present
 	maquina: baseada no numero de máquinas observadas
 	operario: a probabilidade de um operário estar presente está dependente da existência de máquinas
 '''
+
 def criarRedeBayesiana():
 	global bn
 	global maquina
@@ -70,11 +75,12 @@ def criarRedeBayesiana():
 
 '''
 Percorre todas as zonas para atualizar na rede bayesiana as 
-probabilidades que serão alteradas à medida que o robot explora a fábrica
+probabilidades que serão alteradas à medida que o WALL-E explora a fábrica
 	numZonasMaquina: número de zonas descobertas que tem pelo menos uma máquina
 	numZonasOperarioMaquina: número de zonas descobertas que tem pelo menos um operário e um máquina
 	numZonasOperarioNaoMaquina: número de zonas descobertas que tem pelo menos um operário mas não tem máquina
 '''
+
 def atualizarProbRede(G):
 	numZonasTotal = 10 # 15 zonas da fábrica menos entrada e corredores
 	numZonasMaquina = 0
@@ -119,6 +125,7 @@ Devolve:
 	valor da probabilidade pedida ou 
 	-1 se ainda não tivermos informação suficiente (onde irá dar divisão por zero)
 '''
+
 def calcularProbabilidade (G,d,q,num):
 	try:
 		atualizarProbRede(G)

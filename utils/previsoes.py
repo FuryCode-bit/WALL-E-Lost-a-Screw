@@ -1,24 +1,85 @@
 from sklearn.linear_model import LinearRegression
-import numpy as np
- 
 from scipy.optimize import curve_fit
-from utils import ambiente as amb
+from utils.ambiente import *
+import numpy as np
+import time
+
+# Lista com o caminho feito pelo WALL-E
+posicoes = []
+
+# Variáveis auxiliares
+prevPos = 0
+distanciaAcc = 0
+
+# Lista com nodes visitados pelo WALL-E
+listaVisitas = [0]
+
+'''
+Função: A função tem serve para constuir uma lista de tuplos (bateria, tempo) 
+para facilitar na construção da curva. 
+
+Recebe: valor de bateria para constuir uma curva para fazer a previsão através 
+de uma lista de tuplos (bateria, tempo).
+'''
+
+def updateListaBateriaTempo(bateria):
+    global tempoDecorrido, tempo100, pilhaBateriaTempo
+    if bateria == 100:
+        tempo100 = time.time()
  
-def PrevisaoPorBateria(data_points):
+    tempoDecorrido = time.time() - tempo100
  
-    """
-    Args:
-        data_points: lista de tuplos (bateria, tempo)
- 
-    Returns:
-        float: Estimativa do tempo previsto para acabar a bateria
-    """
-    
+    if int(bateria) % 5 == 0 and int(bateria) != 100:
+        pilhaBateriaTempo.append((bateria, tempoDecorrido))
+        # print("pilhaBateriaTempo: ", pilhaBateriaTempo)
+    if int(bateria) == 0:
+        print("Bateria acabou!")
+        # print(pilhaBateriaTempo)
+
+'''
+Função: A função serve para constuir uma lista de tuplos (distancia (acumulada), tempo) 
+para facilitar na construção da regressão linear. 
+
+Recebe: Posição atual do WALL-E no grafo para constuir uma curva para fazer a previsão através 
+de uma lista de tuplos (bateria, tempo)
+'''
+
+def updateListaVisitas(posAtual):
+	global tempoDecorrido, tempo100, listaVisitas, prevPos, distanciaAcc, posicoes, pilhaDistanciaAccTempo
+	if(len(posicoes) > 0):
+		if posicoes[-1] != posAtual:
+				prevPos = posicoes[-1]
+				posicoes.append(posAtual)
+	else:
+		posicoes.append(posAtual)
+		
+	if prevPos != 0:
+		tempoDecorrido = time.time() - tempo100
+		caminho = [prevPos, posAtual]
+		distanciaAcc += distancia(caminho)
+		
+        #print("posicoes: ", posicoes)
+		#print("distanciaAcc: ", distanciaAcc)
+            
+		pilhaDistanciaAccTempo.append((distanciaAcc, tempoDecorrido))
+
+'''
+Função: A função constrói um curva dado uma lista de tuplos (bateria, tempo) 
+para prever o valor do tempo até ficar sem bateria. 
+
+Recebe: lista de tuplos (bateria, tempo)
+
+Retorna: Estimativa do tempo previsto (em segundos) para ficar sem bateria
+'''
+
+def PrevisaoPorBateria():
+    global pilhaBateriaTempo
+
     def non_linear_function(x, a, b, c):
         return a * x ** 2 + b * x + c
  
     # Separar os dados em níveis de bateria e tempos
-    battery_levels, elapsed_time = zip(*data_points)
+    battery_levels, elapsed_time = zip(*pilhaBateriaTempo)
  
     # Ajuste da curva aos dados
     params, covariance = curve_fit(non_linear_function, battery_levels, elapsed_time)
@@ -31,27 +92,28 @@ def PrevisaoPorBateria(data_points):
  
     return time_last
  
-def PrevisaoTempoporDistancia(distanciaPrever, pilhaDistanciaAccTempo):
- 
-	"""
-    Args:
-        distanciaPrever: Distância do ponto em que o robot se encontra até ao escritório;
-        pilhaDistanciaAccTempo: lista de tuplos (distancia acumulada, tempo)
- 
-    Returns:
-        float: Estimativa do tempo previsto para chegar ao escritório 
-        desde o ponto em que o robot se encontra
-    """
- 
-	distancias, tempos = zip(*pilhaDistanciaAccTempo)
- 
-	#converte para arrays
-	x = np.array(distancias).reshape(-1, 1)
-	y = np.array(tempos)
- 
-	modelo = LinearRegression()
-	modelo.fit(x,y)
- 
-	tempo_predict = modelo.predict([[distanciaPrever]])
- 
-	return tempo_predict[0]
+'''
+Função: A função constrói um Regressão Linear dado uma lista de tuplos (distancia (acumulada), tempo) 
+para prever o valor do tempo até chegar ao escritório. 
+
+Recebe: lista de tuplos (distancia (acumulada), tempo)
+
+Retorna: Estimativa do tempo previsto (em segundos) para chegar ao escritório
+'''
+
+def PrevisaoTempoporDistancia(distanciaPrever):
+    
+    global pilhaDistanciaAccTempo
+       
+    distancias, tempos = zip(*pilhaDistanciaAccTempo)
+
+    #converte para arrays
+    x = np.array(distancias).reshape(-1, 1)
+    y = np.array(tempos)
+
+    modelo = LinearRegression()
+    modelo.fit(x,y)
+
+    tempo_predict = modelo.predict([[distanciaPrever]])
+
+    return tempo_predict[0]

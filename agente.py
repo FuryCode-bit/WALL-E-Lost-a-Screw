@@ -4,84 +4,52 @@
 """
  
 '''
-!!!TODO LIST!!!
 PERGUNTAS:
 1. DONE
 2. DONE
 3. DONE
 4. DONE
-5. DONE (~)
+5. DONE
 6. DONE
-7. DONE (I THINK)
+7. TODO
 8. DONE
-
-#TODO -> Arrumar melhor o código e simplificar um pouco (Marco)
 '''
  
 import time
 import networkx as nx
-from utils import p1, previsoes as p, ambiente as amb, probabilidades as pb
- 
+from utils.utils import *
+from utils.previsoes import *
+from utils.ambiente import *
+from utils.probabilidades import *
+
+# Lista com os objetos que o WALL-E teve contacto
 pilha = []
+
+# Lista com as pessoas que o WALL-E teve contacto
 encontros = []
- 
+
+# Lista de tuplos (Bateria,Tempo) para construção da curva 
+# para previsão do tempo dado um valor de bateria
 pilhaBateriaTempo = []
-listaVisitas = [0]
- 
-# Variáveis para o grafo
-posAtual = 10 # Número da zona atual
-G = amb.criarGrafo()
+
+# Lista de tuplos (Distancia,Tempo) para construção da curva 
+# para previsão do tempo dado uma distancia
+pilhaDistanciaAccTempo = []
+
+# Número da zona atual
+posAtual = 10
+
+G = criarGrafo()
 nodeAtual = G.nodes[posAtual]
- 
+
 tempoDecorrido = time.time()
+
+# Tempo inicial (em segundos) em que a bateria se encontrava a 100%
 tempo100 = time.time()
+tempoDecorrido = time.time()
 
 # Criar Rede Bayesiana
-pb.criarRedeBayesiana()
-
-ultimaPosicao = None
-pilhaDistanciaAccTempo = []
-posicoes = []
-prevPos = 0
-distanciaAcc = 0
-'''
-# Debug Function
-def saveFile(pair):
-	with open("pilha.txt", "a") as file:
-		file.write(f"{pair}\n")
-'''		
-# Funções a serem removidas brevemente
-def updateListaBateriaTempo(bateria):
-    global tempoDecorrido, tempo100, pilhaBateriaTempo
-    if bateria == 100:
-        tempo100 = time.time()
- 
-    tempoDecorrido = time.time() - tempo100
- 
-    if int(bateria) % 5 == 0 and int(bateria) != 100:
-        pilhaBateriaTempo.append((bateria, tempoDecorrido))
-        # print("pilhaBateriaTempo: ", pilhaBateriaTempo)
-    if int(bateria) == 0:
-        print("Bateria acabou!")
-        # print(pilhaBateriaTempo)
-        
-def updateListaVisitas():
-	global tempoDecorrido, tempo100, listaVisitas, prevPos, distanciaAcc, posicoes, pilhaDistanciaAccTempo
-	if(len(posicoes) > 0):
-		if posicoes[-1] != posAtual:
-				prevPos = posicoes[-1]
-				posicoes.append(posAtual)
-	else:
-		posicoes.append(posAtual)
-		
-	if prevPos != 0:
-		tempoDecorrido = time.time() - tempo100
-		caminho = [prevPos, posAtual]
-		distanciaAcc += amb.distancia(caminho)
-		#print("posicoes: ", posicoes)
-		#print("distanciaAcc: ", distanciaAcc)
-		#saveFile((amb.distancia(caminho), distanciaAcc, tempoDecorrido))
-		pilhaDistanciaAccTempo.append((distanciaAcc, tempoDecorrido))
+criarRedeBayesiana()
  
 '''
 Esta função identifica cada objeto em que o WALL-E entra em contacto e vai inserindo numa pilha.
@@ -89,6 +57,7 @@ Para identificar um humano é usado uma lista de prefixos com os títulos dispon
 Assim sempre que o WALL-E entrar em contacto com um humano de género masculino vai inserir apenas o seu nome numa pilha de nome pilha_resp1
 (Nomear a pilha de male_pilha ou obj_pessoas poderia deixar os humanos um tanto... objetificados ou confusos com outras coisas, então optei por um nome mais simples! 🤖)
 '''
+
 def work(posicao, bateria, objetos):
  
 	global tempo_final
@@ -100,17 +69,18 @@ def work(posicao, bateria, objetos):
 	# Deteta se a posição atual é diferente dos pontos extremos da zona atual se sim, procura a nova zona
 	if posicao[0] <= nodeAtual["coord"][0][0] or posicao[0] >= nodeAtual["coord"][1][0] \
 	or posicao[1] <= nodeAtual["coord"][0][1] or posicao[1] >= nodeAtual["coord"][1][1]:
-		posAtual, nodeAtual = amb.mudarZona(posicao, posAtual)
-		updateListaVisitas()
+		posAtual, nodeAtual = mudarZona(posicao, posAtual)
+		updateListaVisitas(posAtual)
 		
 	person_prefixes = ['operário_', 'visitante_', 'supervisor_']
 	operario_prefix = 'operário_'
 	supervisor_prefix = 'supervisor_'
 	maquina_prefix = 'máquina_'
+
 	if objetos and isinstance(objetos, list) and len(objetos) == 1:
 		obj = objetos[0]
  		# Se o objeto é uma zona e o tipo da zona atual ainda não tiver sido alterado
-		if obj.startswith("zona_") and amb.compTipoZona(nodeAtual, "sem identificação"):
+		if obj.startswith("zona_") and compTipoZona(nodeAtual, "sem identificação"):
 			nodeAtual["tipo"] = obj[len("zona_"):]
 		elif obj.startswith(maquina_prefix):
 			maquina_value = obj[len(maquina_prefix):]
@@ -129,7 +99,7 @@ def work(posicao, bateria, objetos):
 				if obj.startswith(prefix) and obj not in pilha and obj[len(prefix):] not in pilha:
 					obj_without_prefix = obj[len(prefix):]
 					pilha.append(obj_without_prefix)
-					if p1.identifica_genero(obj_without_prefix) == True:
+					if identifica_genero(obj_without_prefix) == True:
 						encontros.append(obj)
 						#print("pilha: ", pilha)
 						#print("encontros: ", encontros)
@@ -137,15 +107,13 @@ def work(posicao, bateria, objetos):
 					break
  
 	updateListaBateriaTempo(bateria)
-	amb.givePosicao(posicao)
+	givePosicao(posicao)
 	# print("dados: ", posicao, bateria, objetos, time.perf_counter())
  
-'''
-Esta função começa por verificar quantas pessoas de género masculino o WALL-E esteve em contacto.
-Se apenas teve em contacto com uma (ou com nenhuma) ele indica que não possui informação suficiente para resolver o problema.
-Se tiver toda a informação necessária, vai indicar o nome da penúltima pessoa que encontrou!
-'''
+
 def resp1():
+	''' Qual foi a penúltima pessoa do sexo masculino que viste? '''
+
 	if len(encontros) >= 2:
 		penultimo = encontros[-2]
 		print("O penultimo elemento é: ", penultimo)
@@ -153,13 +121,17 @@ def resp1():
 		print("Não existe informação suficiente")
  
 def resp2():
+	''' Em que tipo de zona estás agora? '''
+
 	print("A zona", posAtual, "é do tipo", nodeAtual["tipo"])
  
 def resp3():
-	if amb.compTipoZona(nodeAtual, "empacotamento"):
+	''' Qual o caminho para a zona de empacotamento? '''
+
+	if compTipoZona(nodeAtual, "empacotamento"):
 		print("Já estou na zona de empacotamento")
 	else:
-		dest = amb.procurarTipoZona("empacotamento")
+		dest = procurarTipoZona("empacotamento")
 		if dest == -1:
 			print("Ainda não sei a localização da zona de empacotamento")
 		else:
@@ -167,50 +139,58 @@ def resp3():
 			print("O caminho desde a zona", posAtual, "até a zona de empacotamento", dest, "é:", nx.shortest_path(G, posAtual, dest))
  
 def resp4():
-	if amb.compTipoZona(nodeAtual, "laboratório"):
+	''' Qual a distância até ao laboratório? '''
+
+	if compTipoZona(nodeAtual, "laboratório"):
 		print("Já estou no laboratório")
 	else:
-		dest = amb.procurarTipoZona("laboratório")
+		dest = procurarTipoZona("laboratório")
 		if dest == -1:
 			print("Ainda não sei a localização do laboratório")
 		else:
 			caminho = nx.shortest_path(G, posAtual, dest) # Encontrar caminho
-			distTotal = amb.distancia(caminho)
+			distTotal = distancia(caminho)
 			print("A distância desde a zona", posAtual, "até o laboratório", dest, "é", distTotal)
  
 def resp5():
-	if amb.compTipoZona(nodeAtual, "escritório"):
+	''' Quanto tempo achas que demoras a ir de onde estás até ao escritório? '''
+
+	if compTipoZona(nodeAtual, "escritório"):
 		print("Já estou no escritório")
 	else:
-		dest = amb.procurarTipoZona("escritório")
+		dest = procurarTipoZona("escritório")
 		if dest == -1:
 			print("Ainda não sei a localização do escritório")
 		else:
 			caminho = nx.shortest_path(G, posAtual, dest) 
-			distTotal = amb.distancia(caminho)
+			distTotal = distancia(caminho)
 			print("A distância desde a zona", posAtual, "até o laboratório", dest, "é", distTotal)
 			
-			print("A previsão de chegada ao escritório é de ", p.PrevisaoTempoporDistancia(distTotal, pilhaDistanciaAccTempo), "segundos")
+			print("A previsão de chegada ao escritório é de ", PrevisaoTempoporDistancia(distTotal), "segundos")
  
 def resp6():
-	global pilhaBateriaTempo
-	
-	# Chama a função para estimar o tempo necessário
-	tempo_estimado = p.PrevisaoPorBateria(pilhaBateriaTempo)
+	''' Quanto tempo achas que falta até ficares sem bateria? '''
+
+	# Chama a função para estimar o tempo necessáriopara ficar sem bateria
+	tempo_estimado = PrevisaoPorBateria()
  
 	# Exibe o tempo estimado para atingir o nível de bateria desejado
 	print(f"Tempo estimado para atingir 0% de bateria: {tempo_estimado:.2f} segundos")
  
 def resp7():
-	res = pb.calcularProbabilidade(G,{}, 'supervisor', 1) 
+	''' Qual é a probabilidade da próxima pessoa a encontrares ser um supervisor? '''
+	## TODO
+	res = calcularProbabilidade(G,{}, 'supervisor', 1) 
 	if res == -1:
 		print("Não existe informação suficiente no mundo conhecido!")
 	else:
 		print("A P(Supervisor) =", res)
 		
 def resp8():
-	def resp8():
-	res = pb.calcularProbabilidade(G,{'maquina': 1, 'supervisor': 0}, 'operario', 1) 
+	''' Qual é a probabilidade de encontrar um operário numa zona se estiver lá uma 
+	máquina mas não estiver lá um supervisor? '''
+	
+	res = calcularProbabilidade(G,{'maquina': 1, 'supervisor': 0}, 'operario', 1) 
 	if res == -1:
 		print("Não existe informação suficiente no mundo conhecido!")
 	else:

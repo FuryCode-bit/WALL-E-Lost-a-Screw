@@ -5,7 +5,7 @@ def givePosicao(posicao):
 	global posicaoRobot 
 	posicaoRobot = posicao
  
-# Transferir a posição atual do robot para as funções de resposta
+# Transferir a posição atual do WALL-E para as funções de resposta
 def getPosicao():
 	return posicaoRobot
  
@@ -23,6 +23,7 @@ Cada aresta (ligação entre duas zonas) tem o seguinte atributo:
 	ligacao: indica um ponto em comum entre as duas zonas
 		este atributo será utilizado para calcular a distância entre zonas
 '''
+
 def criarGrafo():
 	global G
 	G = nx.Graph()
@@ -86,17 +87,18 @@ def criarGrafo():
 	return G
  
 '''
-Recebe as coordenadas do robot e o número da zona atual para descobrir para qual das zonas este se deslocou
+Recebe as coordenadas do WALL-E e o número da zona atual para descobrir para qual das zonas este se deslocou
 	G[posatual]: devolve os vizinhos da zona atual; estes são suficientes para a pesquisa
 Devolve:
 	posAtual = numero da zona atualizada e
 	G.nodes[posAtual] = nodo correspondente à zona atual
 '''
+
 def mudarZona(posicao, posAtual):
 	for i in G[posAtual]:
 		teste = G.nodes[i]["coord"]
 		
-		# Compara as coordenadas da posição do robot com os pontos extremos da zona que estamos a testar
+		# Compara as coordenadas da posição do WALL-E com os pontos extremos da zona que estamos a testar
 		if posicao[0] >= teste[0][0] and posicao[0] <= teste[1][0] \
 		and posicao[1] >= teste[0][1] and posicao[1] <= teste[1][1]:
 			posAtual = i
@@ -117,6 +119,7 @@ Devolve:
 	True se for do mesmo tipo ou 
 	False caso contrário
 '''
+
 def compTipoZona(node, tipo):
 	if node["tipo"] == tipo:
 		return True
@@ -128,6 +131,7 @@ Devolve:
 	Número da zona correspondente ou
 	-1 se não encontrar
 '''
+
 def procurarTipoZona(tipo):
 	dest = -1
 	for i in range(15):
@@ -145,10 +149,11 @@ def pontoMedio(posicao):
 	return [pontoMedioX, pontoMedioY]
  
 '''
-Dado um caminho calcula a distância desde a posição atual do robot até ao ponto médio da zona destino
+Dado um caminho calcula a distância desde a posição atual do WALL-E até ao ponto médio da zona destino
 Para realizar os cálculos, utiliza o ponto de ligação entre a zona que estamos a observar e a zona seguinte do caminho
 Por fim, faz um cálculo extra para calcular a distância em específico para o ponto médio
 '''
+
 def distancia(caminho):
 	distTotal = 0
 	posAnterior = [0,0]
@@ -158,7 +163,7 @@ def distancia(caminho):
 		nodeZona = G.nodes[zonaAtual]
 		ligacao = G[zonaAtual][caminho[i + 1]]["ligacao"]
  
-		# Se for a zona inicial utiliza a posição onde o robot se encontra
+		# Se for a zona inicial utiliza a posição onde o WALL-E se encontra
 		if posAnterior == [0,0]:
 			pos = getPosicao()
 		# Se for um corredor utiliza a posição anterior
