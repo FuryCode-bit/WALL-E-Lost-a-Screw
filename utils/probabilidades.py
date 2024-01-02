@@ -2,8 +2,7 @@ import pyAgrum as gum
 
 def probabilidadeProximoSerSupervisor():
 
-	#TODO -> Não esquecer documentar a implementação
-	## Input: G.nodes(data=True)
+	#Solução: P(C) = P(C | A, B) * P(A, B) + P(C | ¬A, B) * P(¬A, B) + P(C | A, ¬B) * P(A, ¬B) + P(C | ¬A, ¬B) * P(¬A, ¬B)
 	
 	"""
 	Determina a probabilidade de a proxima pessoa ser um supervisor
