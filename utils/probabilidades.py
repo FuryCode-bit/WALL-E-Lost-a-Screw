@@ -1,50 +1,45 @@
 import pyAgrum as gum
+ 
+"""
+Determina a probabilidade de a proxima pessoa ser um supervisor
+Contabiliza os "objetos" agrupando-os de forma individual
+ 
+Explicação: Assumindo que Os supervisores querem avaliar o comportamento dos operários, 
+especialmente quando estão a trabalhar com as máquinas. Podemos assumir que existe uma 
+forte necessidade de se existe um operário existe uma grande chance de haver um supervisor.
+ 
+Logo poderemos calcular a p(supervisor) = p(supervisor | operario)
+ 
+O que dará p(supervisor) = (p(supervisor, operario))/p(operario)
+ 
+Através da regra da probabilidade total poderemos calcular
+P(supervisor, operario)=P(supervisor,maquina,operario)+P(B,¬maquina,supervisor)
+ 
+Returns:
+	float: probabilidade de a proxima pessoa avistada ser um supervisor
+"""
+ 
+def probabilidadeProximoSerSupervisor(G):  
 
-def probabilidadeProximoSerSupervisor():
-	'''
-	 A _> Máquina
-	 B -> Operário
-	 C -> Supervisor
-
-	Solução: P(C) = P(C | A, B) * P(A, B) + P(C | ¬A, B) * P(¬A, B) + P(C | A, ¬B) * P(A, ¬B) + P(C | ¬A, ¬B) * P(¬A, ¬B)
-	'''	
-	"""
-	Determina a probabilidade de a proxima pessoa ser um supervisor
-	Contabiliza os "objetos" agrupando-os de forma individual
-
-	Returns:
-		float: probabilidade de a proxima pessoa avistada ser um supervisor
-	"""
-
-	global G
-	
 	# Contadores
-	counters = {
-		"countA": 0,
-		"countB": 0,
-		"countC": 0
-	}
+	contadorMaquinas = 0
+	contadorOperarios = 0
+	contadorSupervisores = 0
 
 	for node in G.nodes(data=True):
-		counters["countA"] += len(node[1]["maquinas"]) if len(node[1]["maquinas"]) > 0 else 0
-		counters["countB"] += len(node[1]["operarios"]) if len(node[1]["operarios"]) > 0 else 0
-		counters["countC"] += len(node[1]["supervisores"]) if len(node[1]["supervisores"]) > 0 else 0
+		contadorMaquinas += len(node[1]["maquinas"]) if len(node[1]["maquinas"]) > 0 else 0
+		contadorOperarios += len(node[1]["operarios"]) if len(node[1]["operarios"]) > 0 else 0
+		contadorSupervisores += len(node[1]["supervisores"]) if len(node[1]["supervisores"]) > 0 else 0
 
-	# print("countA: ", counters["countA"])
-	# print("countB: ", counters["countB"])
-	# print("countC: ", counters["countC"])
+	total = contadorMaquinas + contadorOperarios + contadorSupervisores
+	print("total: ", total)
 
-	total_objects = counters["countA"] + counters["countB"] + counters["countC"]
-	print("total_objects: ", total_objects)
+	pMaquinas = contadorMaquinas / total
+	pOperarios = contadorOperarios / total
 
-	pA = counters["countA"] / total_objects
-	pB = counters["countB"] / total_objects
+	probabilidade = ((pMaquinas * pOperarios * 0.8) + ((1 - pMaquinas) * pOperarios * 0.5)) / pOperarios
 
-	pBAC = (pA * pB * 0.8)
-	pBnAC = ((1 - pA) * pB * 0.5)
-	pCandB = pBAC + pBnAC
-
-	return pCandB / pB
+	return probabilidade
 
 '''
 Cria um Rede Bayesiana que relaciona as probabilidades numa zona estarem presentes:
