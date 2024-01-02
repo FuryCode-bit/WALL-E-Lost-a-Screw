@@ -11,7 +11,7 @@ PERGUNTAS:
 4. DONE
 5. DONE
 6. DONE
-7. TODO
+7. DONE
 8. DONE
 '''
  
@@ -22,19 +22,11 @@ from utils.previsoes import *
 from utils.ambiente import *
 from utils.probabilidades import *
 
-# Lista com os objetos que o WALL-E teve contacto
+# Lista com os objetos que o robot teve contacto
 pilha = []
 
-# Lista com as pessoas que o WALL-E teve contacto
+# Lista com as pessoas que o robot teve contacto
 encontros = []
-
-# Lista de tuplos (Bateria,Tempo) para construção da curva 
-# para previsão do tempo dado um valor de bateria
-pilhaBateriaTempo = []
-
-# Lista de tuplos (Distancia,Tempo) para construção da curva 
-# para previsão do tempo dado uma distancia
-pilhaDistanciaAccTempo = []
 
 # Número da zona atual
 posAtual = 10
@@ -52,9 +44,9 @@ tempoDecorrido = time.time()
 criarRedeBayesiana()
  
 '''
-Esta função identifica cada objeto em que o WALL-E entra em contacto e vai inserindo numa pilha.
+Esta função identifica cada objeto em que o robot entra em contacto e vai inserindo numa pilha.
 Para identificar um humano é usado uma lista de prefixos com os títulos disponíveis. 
-Assim sempre que o WALL-E entrar em contacto com um humano de género masculino vai inserir apenas o seu nome numa pilha de nome pilha_resp1
+Assim sempre que o robot entrar em contacto com um humano de género masculino vai inserir apenas o seu nome numa pilha de nome pilha_resp1
 (Nomear a pilha de male_pilha ou obj_pessoas poderia deixar os humanos um tanto... objetificados ou confusos com outras coisas, então optei por um nome mais simples! 🤖)
 '''
 
@@ -154,7 +146,7 @@ def resp4():
  
 def resp5():
 	''' Quanto tempo achas que demoras a ir de onde estás até ao escritório? '''
-
+	
 	if compTipoZona(nodeAtual, "escritório"):
 		print("Já estou no escritório")
 	else:
@@ -164,27 +156,27 @@ def resp5():
 		else:
 			caminho = nx.shortest_path(G, posAtual, dest) 
 			distTotal = distancia(caminho)
-			print("A distância desde a zona", posAtual, "até o laboratório", dest, "é", distTotal)
-			
+			#print("A distância desde a zona", posAtual, "até o escritório", dest, "é", distTotal)
+
 			print("A previsão de chegada ao escritório é de ", PrevisaoTempoporDistancia(distTotal), "segundos")
- 
+		
 def resp6():
 	''' Quanto tempo achas que falta até ficares sem bateria? '''
-
-	# Chama a função para estimar o tempo necessáriopara ficar sem bateria
-	tempo_estimado = PrevisaoPorBateria()
- 
-	# Exibe o tempo estimado para atingir o nível de bateria desejado
-	print(f"Tempo estimado para atingir 0% de bateria: {tempo_estimado:.2f} segundos")
- 
+	try:
+		# Chama a função para estimar o tempo necessáriopara ficar sem bateria
+		tempo_estimado = PrevisaoPorBateria()
+	 
+		# Exibe o tempo estimado para atingir o nível de bateria desejado
+		print(f"Tempo estimado para atingir 0% de bateria: {tempo_estimado:.2f} segundos")
+	except ValueError:
+		print("Não existem dados suficientes para fazer previsão")
 def resp7():
 	''' Qual é a probabilidade da próxima pessoa a encontrares ser um supervisor? '''
-	## TODO
-	res = calcularProbabilidade(G,{}, 'supervisor', 1) 
-	if res == -1:
+
+	try:
+		print("A P(Supervisor) =", probabilidadeProximoSerSupervisor(G))
+	except ZeroDivisionError:
 		print("Não existe informação suficiente no mundo conhecido!")
-	else:
-		print("A P(Supervisor) =", res)
 		
 def resp8():
 	''' Qual é a probabilidade de encontrar um operário numa zona se estiver lá uma 
