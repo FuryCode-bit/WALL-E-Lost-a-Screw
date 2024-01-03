@@ -72,15 +72,27 @@ def criarRedeBayesiana():
 	bn.cpt(supervisor)[{'maquina': 1, 'operario': 1}] = [0.2,0.8]
 
 '''
+Calcula a probabilidade tendo em conta os parâmetros fornecidos
+	d: evidência
+	q: probabilidade que queremos calcular
+	num: 0 ou 1, indica se queremos a probabilidade de q ser falso (0) ou verdadeiro (1)
+'''
+def calcularProbabilidade (G,d,q,num):
+	ie = gum.LazyPropagation(bn)
+	ie.setEvidence(d)
+	ie.makeInference()
+	
+	return ie.posterior(q)[num]
+
+'''
 Percorre todas as zonas para atualizar na rede bayesiana as 
-probabilidades que serão alteradas à medida que o WALL-E explora a fábrica
+probabilidades que serão alteradas à medida que o robot explora a fábrica
 	numZonasMaquina: número de zonas descobertas que tem pelo menos uma máquina
 	numZonasOperarioMaquina: número de zonas descobertas que tem pelo menos um operário e um máquina
 	numZonasOperarioNaoMaquina: número de zonas descobertas que tem pelo menos um operário mas não tem máquina
 '''
-
 def atualizarProbRede(G):
-	numZonasTotal = 10 # 15 zonas da fábrica menos entrada e corredores
+	numZonasTotal = 0
 	numZonasMaquina = 0
 	numZonasOperarioMaquina = 0
 	numZonasOperarioNaoMaquina = 0
@@ -94,10 +106,11 @@ def atualizarProbRede(G):
 				# Se tem operário e máquina na mesma zona
 				if G.nodes[i]["operarios"] != []:
 					numZonasOperarioMaquina += 1
-			else:
-				# Se tem operário e não tem máquina
-				if G.nodes[i]["operarios"] != []:
-					numZonasOperarioNaoMaquina += 1
+				numZonasTotal += 1
+		# Se tem operário e não tem máquina
+		if G.nodes[i]["operarios"] != []:
+			numZonasOperarioNaoMaquina += 1
+			numZonasTotal += 1
 		
 	# Calcular probabilidades
 	probMaquina = numZonasMaquina / numZonasTotal			
@@ -112,26 +125,3 @@ def atualizarProbRede(G):
 	bn.cpt(maquina)[{}] = [1 - probMaquina, probMaquina]
 	bn.cpt(operario)[{'maquina': 0}] = [1 - probOperarioSeNaoMaquina, probOperarioSeNaoMaquina]
 	bn.cpt(operario)[{'maquina': 1}] = [1 - probOperarioSeMaquina, probOperarioSeMaquina]
-	
-'''
-Calcula a probabilidade tendo em conta os parâmetros fornecidos
-	d: evidência
-	q: probabilidade que queremos calcular
-	num: 0 ou 1, indica se queremos a probabilidade de q ser falso (0) ou verdadeiro (1)
-
-Devolve: 
-	valor da probabilidade pedida ou 
-	-1 se ainda não tivermos informação suficiente (onde irá dar divisão por zero)
-'''
-
-def calcularProbabilidade (G,d,q,num):
-	try:
-		atualizarProbRede(G)
-		
-		ie = gum.LazyPropagation(bn)
-		ie.setEvidence(d)
-		ie.makeInference()
-		
-		return ie.posterior(q)[num]
-	except ZeroDivisionError:
-		return -1
