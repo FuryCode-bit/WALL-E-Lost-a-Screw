@@ -2,19 +2,6 @@
 45703, Marco Bernardes
 46811, Ana Lúcia Ferreira
 """
- 
-'''
-PERGUNTAS:
-1. DONE
-2. DONE
-3. DONE
-4. DONE
-5. DONE
-6. DONE
-7. DONE
-8. DONE
-'''
- 
 import time
 import networkx as nx
 from utils.utils import *
@@ -28,9 +15,10 @@ pilha = []
 # Lista com as pessoas que o robot teve contacto
 encontros = []
 
-# Número da zona atual
+# Número da zona inicial
 posAtual = 10
 
+# Variáveis para o grafo
 G = criarGrafo()
 nodeAtual = G.nodes[posAtual]
 
@@ -43,20 +31,12 @@ tempoDecorrido = time.time()
 # Criar Rede Bayesiana
 criarRedeBayesiana()
  
-'''
-Esta função identifica cada objeto em que o robot entra em contacto e vai inserindo numa pilha.
-Para identificar um humano é usado uma lista de prefixos com os títulos disponíveis. 
-Assim sempre que o robot entrar em contacto com um humano de género masculino vai inserir apenas o seu nome numa pilha de nome pilha_resp1
-(Nomear a pilha de male_pilha ou obj_pessoas poderia deixar os humanos um tanto... objetificados ou confusos com outras coisas, então optei por um nome mais simples! 🤖)
-'''
-
 def work(posicao, bateria, objetos):
- 
-	global tempo_final
-	global tempo_decorrido
- 
 	global posAtual
 	global nodeAtual
+	
+	global tempo_final
+	global tempo_decorrido
  
 	# Deteta se a posição atual é diferente dos pontos extremos da zona atual se sim, procura a nova zona
 	if posicao[0] <= nodeAtual["coord"][0][0] or posicao[0] >= nodeAtual["coord"][1][0] \
@@ -102,7 +82,6 @@ def work(posicao, bateria, objetos):
 	givePosicao(posicao)
 	# print("dados: ", posicao, bateria, objetos, time.perf_counter())
  
-
 def resp1():
 	''' Qual foi a penúltima pessoa do sexo masculino que viste? '''
 
@@ -114,7 +93,7 @@ def resp1():
  
 def resp2():
 	''' Em que tipo de zona estás agora? '''
-
+	
 	print("A zona", posAtual, "é do tipo", nodeAtual["tipo"])
  
 def resp3():
@@ -127,7 +106,7 @@ def resp3():
 		if dest == -1:
 			print("Ainda não sei a localização da zona de empacotamento")
 		else:
-			# nx.shortest_path devolve o caminho composto apenas pelos numeros das zonas
+			# nx.shortest_path devolve o caminho composto apenas pelos números das zonas
 			print("O caminho desde a zona", posAtual, "até a zona de empacotamento", dest, "é:", nx.shortest_path(G, posAtual, dest))
  
 def resp4():
@@ -182,9 +161,10 @@ def resp8():
 	''' Qual é a probabilidade de encontrar um operário numa zona se estiver lá uma 
 	máquina mas não estiver lá um supervisor? '''
 	
-	res = calcularProbabilidade(G,{'maquina': 1, 'supervisor': 0}, 'operario', 1) 
-	if res == -1:
+	try:
+		atualizarProbRede(G)
+		res = calcularProbabilidade(G,{'maquina': 1, 'supervisor': 0}, 'operario', 1) 
+		print("P(Operário|Máquina,!Supervisor) =", res)
+	except ZeroDivisionError:
 		print("Não existe informação suficiente no mundo conhecido!")
-	else:
-		print("A P(Operário|Máquina,!Supervisor) =", res)
 
