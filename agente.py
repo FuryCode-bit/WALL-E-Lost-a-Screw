@@ -1,7 +1,3 @@
-"""
-45703, Marco Bernardes
-46811, Ana Lúcia Ferreira
-"""
 import time
 import networkx as nx
 from utils.utils import *
